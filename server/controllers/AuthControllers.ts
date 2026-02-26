@@ -23,15 +23,29 @@ export const registerUser = async (req: Request, res: Response) => {
         // setting user data in session
         req.session.isLoggedIn = true;
         req.session.userId = newUser._id;
-
-        return res.json({
-            message: 'Account created successfully',
-            user: {
-                _id: newUser._id,
-                name: newUser.name,
-                email: newUser.email,
-            },
+        
+        req.session.save((err) => {
+            if (err) {
+                return res.status(500).json({ message: 'Session save failed' });
+            }
+            return res.json({
+                message: 'Account created successfully',
+                user: {
+                    _id: newUser._id,
+                    name: newUser.name,
+                    email: newUser.email,
+                },
+            });
         });
+
+        // return res.json({
+        //     message: 'Account created successfully',
+        //     user: {
+        //         _id: newUser._id,
+        //         name: newUser.name,
+        //         email: newUser.email,
+        //     },
+        // });
     } catch (error: any) {
         console.log(error);
         res.status(500).json({ message: error.message });
@@ -56,15 +70,29 @@ export const loginUser = async (req: Request, res: Response) => {
         // setting user data in session
         req.session.isLoggedIn = true;
         req.session.userId = user._id;
-
-        return res.json({
-            message: 'Login successful',
-            user: {
-                _id: user._id,
-                name: user.name,
-                email: user.email,
-            },
+        
+        req.session.save((err) => {
+            if (err) {
+                return res.status(500).json({ message: 'Session save failed' });
+            }
+            return res.json({
+                message: 'Login successful',
+                user: {
+                    _id: user._id,
+                    name: user.name,
+                    email: user.email,
+                },
+            });
         });
+
+        // return res.json({
+        //     message: 'Login successful',
+        //     user: {
+        //         _id: user._id,
+        //         name: user.name,
+        //         email: user.email,
+        //     },
+        // });
     } catch (error: any) {
         console.log(error);
         res.status(500).json({ message: error.message });
