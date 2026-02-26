@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - fullstack-net
+    restart: unless-stopped
+  server:
+    build: ./server
+    image: express-server
+    container_name: express-server
+    ports:
+      - "3000:3000"
+    env_file:
+      - ./server/.env
+    networks:
+      - fullstack-net
+    restart: unless-stopped
+
+  client:
+    build: ./client
+    image: react-client
+    container_name: react-client
+    ports:
+      - "5173:3000"
+    networks:
+      - fullstack-net
+    depends_on:
+      - server
+    restart: unless-stopped
+   
+networks:
+  fullstack-net:
+    driver: bridge
+
+volumes:
+  mongo-data:
