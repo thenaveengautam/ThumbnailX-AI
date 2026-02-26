@@ -78,13 +78,18 @@ export const logoutUser = async (req: Request, res: Response) => {
             console.log(error);
             return res.status(500).json({ message: error.message });
         }
+        return res.json({ message: 'Logout successful' }); // add this
     });
-    return res.json({ message: 'Logout successful' });
+    // return res.json({ message: 'Logout successful' });
 };
 
 // Controllers For User Verify
 export const verifyUser = async (req: Request, res: Response) => {
     try {
+        // add this
+        if (!req.session.isLoggedIn) {
+            return res.status(401).json({ message: 'You are not logged in' });
+        }
         const { userId } = req.session;
 
         const user = await User.findById(userId).select('-password');
