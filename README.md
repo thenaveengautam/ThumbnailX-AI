@@ -6,14 +6,15 @@ Built with a MERN stack architecture, this application integrates Google Gemini 
 
 ## 🚀 Features
 
-- **🎨 AI Thumbnail Generation using Gemini API
-- **🖼️ Image Storage with Cloudinary
-- **🔐 Secure Authentication (JWT-based sessions)
-- **📦 Modular Backend Architecture
-- **⚡ Fast Frontend built with React + Vite
-- **🐳 Docker Support
-- **📱 Fully Responsive UI
-- **🌙 Clean and Modern Design
+- **🤖 AI-Powered Thumbnail Generation**: Generate stunning thumbnails using Google Gemini API
+- **📸 Image Hosting**: Seamlessly upload and manage thumbnails with Cloudinary
+- **🔒 Secure Authentication**: User registration and login with JWT authentication
+- **💾 MongoDB Storage**: Store user data and thumbnail metadata securely
+- **🐳 Dockerized**: Easy setup and deployment with Docker
+- **🌐 CORS Configuration**: Secure cross-origin requests for frontend-backend communication
+- **⚡ Fast Performance**: Optimized backend and frontend for quick thumbnail generation
+- **📱 Responsive Design**: Mobile-friendly UI for easy access on any device
+- **🛠️ Developer-Friendly**: Clean codebase with TypeScript and modern development practices
 
 ## 🏗️ Architecture
 
