@@ -1,5 +1,6 @@
 import express, { Request, Response } from 'express';
 import cors from 'cors'
+import cookieParser from 'cookie-parser';
 import 'dotenv/config'
 import connectDB from './configs/db.js';
 import session from 'express-session'
@@ -23,7 +24,7 @@ app.use(cors({
     origin: [
         'http://localhost:5173',
         'http://localhost:3000',
-        'https://thumbnailx-ai.vercel.app'
+        'https://thumbnailx.naveengautam.dev'
     ],
     credentials: true
 }))
@@ -47,6 +48,7 @@ app.use(session({
     })
 }))
 
+app.use(cookieParser());
 app.use(express.json())
 
 app.get('/', (req: Request, res: Response) => {

@@ -1,13 +1,19 @@
 import { Request, Response, NextFunction } from 'express';
+import jwt from 'jsonwebtoken';
 
-const protect = async (req: Request, res: Response, next: NextFunction) => {
-    const { isLoggedIn, userId } = req.session;
+const JWT_SECRET = process.env.JWT_SECRET as string;
 
-    if (!isLoggedIn || !userId) {
+const protect = (req: Request, res: Response, next: NextFunction) => {
+    const token = req.cookies?.token;
+    if (!token) return res.status(401).json({ message: 'You are not logged in' });
+
+    try {
+        const decoded = jwt.verify(token, JWT_SECRET) as { userId: string };
+        req.session.userId = decoded.userId;
+        next();
+    } catch {
         return res.status(401).json({ message: 'You are not logged in' });
     }
-
-    next();
 };
 
-export default protect;
+export default protect
