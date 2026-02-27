@@ -5,24 +5,21 @@ import jwt from 'jsonwebtoken';
 const JWT_SECRET = process.env.JWT_SECRET as string;
 
 const getUserId = (req: Request) => {
-    const token = req.cookies?.token;
-    const decoded = jwt.verify(token, JWT_SECRET) as { userId: string };
+    const token = req.headers.authorization?.split(' ')[1];
+    const decoded = jwt.verify(token!, JWT_SECRET) as { userId: string };
     return decoded.userId;
 }
 
-// Controllers to get All User Thumbnails
 export const getUsersThumbnails = async (req: Request, res: Response) => {
     try {
         const userId = getUserId(req);
         const thumbnails = await Thumbnail.find({ userId }).sort({ createdAt: -1 });
         res.json({ thumbnails });
     } catch (error: any) {
-        console.log(error);
         res.status(500).json({ message: error.message });
     }
 };
 
-// Controllers to get single Thumbnail of a User
 export const getThumbnailbyId = async (req: Request, res: Response) => {
     try {
         const userId = getUserId(req);
@@ -30,7 +27,6 @@ export const getThumbnailbyId = async (req: Request, res: Response) => {
         const thumbnail = await Thumbnail.findOne({ userId, _id: id });
         res.json({ thumbnail });
     } catch (error: any) {
-        console.log(error);
         res.status(500).json({ message: error.message });
     }
 };
