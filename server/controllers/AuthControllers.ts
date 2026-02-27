@@ -25,6 +25,8 @@ export const registerUser = async (req: Request, res: Response) => {
             path: '/'
         });
 
+        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+        
         return res.json({ message: 'Account created successfully', user: { _id: newUser._id, name: newUser.name, email: newUser.email } });
     } catch (error: any) {
         res.status(500).json({ message: error.message });
@@ -49,6 +51,8 @@ export const loginUser = async (req: Request, res: Response) => {
             maxAge: 7 * 24 * 60 * 60 * 1000,
             path: '/'
         });
+
+        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
 
         return res.json({ message: 'Login successful', user: { _id: user._id, name: user.name, email: user.email } });
     } catch (error: any) {
