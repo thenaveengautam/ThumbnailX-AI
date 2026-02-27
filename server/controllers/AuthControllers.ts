@@ -17,17 +17,7 @@ export const registerUser = async (req: Request, res: Response) => {
 
         const token = jwt.sign({ userId: newUser._id }, JWT_SECRET, { expiresIn: '7d' });
 
-        res.cookie('token', token, {
-            httpOnly: true,
-            secure: true,
-            sameSite: 'none',
-            maxAge: 7 * 24 * 60 * 60 * 1000,
-            path: '/'
-        });
-
-        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
-        
-        return res.json({ message: 'Account created successfully', user: { _id: newUser._id, name: newUser.name, email: newUser.email } });
+        return res.json({ message: 'Account created successfully', token, user: { _id: newUser._id, name: newUser.name, email: newUser.email } });
     } catch (error: any) {
         res.status(500).json({ message: error.message });
     }
@@ -44,32 +34,23 @@ export const loginUser = async (req: Request, res: Response) => {
 
         const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '7d' });
 
-        res.cookie('token', token, {
-            httpOnly: true,
-            secure: true,
-            sameSite: 'none',
-            maxAge: 7 * 24 * 60 * 60 * 1000,
-            path: '/'
-        });
-
-        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
-
-        return res.json({ message: 'Login successful', user: { _id: user._id, name: user.name, email: user.email } });
+        return res.json({ message: 'Login successful', token, user: { _id: user._id, name: user.name, email: user.email } });
     } catch (error: any) {
         res.status(500).json({ message: error.message });
     }
 };
 
 export const logoutUser = async (req: Request, res: Response) => {
-    res.clearCookie('token', { httpOnly: true, secure: true, sameSite: 'none', path: '/' });
     return res.json({ message: 'Logout successful' });
 };
 
 export const verifyUser = async (req: Request, res: Response) => {
     try {
-        const token = req.cookies?.token;
-        if (!token) return res.status(401).json({ message: 'You are not logged in' });
-
+        const authHeader = req.headers.authorization;
+        if (!authHeader || !authHeader.startsWith('Bearer ')) {
+            return res.status(401).json({ message: 'You are not logged in' });
+        }
+        const token = authHeader.split(' ')[1];
         const decoded = jwt.verify(token, JWT_SECRET) as { userId: string };
         const user = await User.findById(decoded.userId).select('-password');
         if (!user) return res.status(400).json({ message: 'Invalid user' });

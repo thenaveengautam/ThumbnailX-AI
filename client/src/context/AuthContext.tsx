@@ -30,6 +30,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const signUp = async ({ name, email, password }: { name: string; email: string; password: string }) => {
         try {
             const { data } = await api.post('/api/auth/register', { name, email, password });
+            if (data.token) {
+                localStorage.setItem('token', data.token);
+            }
             if (data.user) {
                 setUser(data.user as IUser);
                 setIsLoggedIn(true);
@@ -43,6 +46,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const login = async ({ email, password }: { email: string; password: string }) => {
         try {
             const { data } = await api.post('/api/auth/login', { email, password });
+            if (data.token) {
+                localStorage.setItem('token', data.token);
+            }
             if (data.user) {
                 setUser(data.user as IUser);
                 setIsLoggedIn(true);
@@ -55,10 +61,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     const logout = async () => {
         try {
-            const { data } = await api.post('/api/auth/logout');
+            await api.post('/api/auth/logout');
+            localStorage.removeItem('token');
             setUser(null);
             setIsLoggedIn(false);
-            toast.success(data.message);
+            toast.success('Logout successful');
         } catch (error) {
             console.log(error);
         }
@@ -66,7 +73,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     const fetchUser = async () => {
         try {
-            const { data } = await api.get('/api/auth/verify');
+            const token = localStorage.getItem('token');
+            if (!token) return;
+            const { data } = await api.get('/api/auth/verify', {
+                headers: { Authorization: `Bearer ${token}` }
+            });
             if (data.user) {
                 setUser(data.user as IUser);
                 setIsLoggedIn(true);
@@ -77,9 +88,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     };
 
     useEffect(() => {
-        (async () => {
-            await fetchUser();
-        })();
+        fetchUser();
     }, []);
 
     const value = {
