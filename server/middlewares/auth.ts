@@ -8,12 +8,11 @@ const protect = (req: Request, res: Response, next: NextFunction) => {
     if (!token) return res.status(401).json({ message: 'You are not logged in' });
 
     try {
-        const decoded = jwt.verify(token, JWT_SECRET) as { userId: string };
-        req.session.userId = decoded.userId;
+        jwt.verify(token, JWT_SECRET);
         next();
     } catch {
         return res.status(401).json({ message: 'You are not logged in' });
     }
 };
 
-export default protect
+export default protect;

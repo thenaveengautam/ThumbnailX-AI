@@ -3,6 +3,15 @@ import Thumbnail from '../models/Thumbnail.js';
 import { GenerateContentConfig, HarmBlockThreshold, HarmCategory } from '@google/genai';
 import ai from '../configs/ai.js';
 import { v2 as cloudinary } from 'cloudinary';
+import jwt from 'jsonwebtoken';
+
+const JWT_SECRET = process.env.JWT_SECRET as string;
+
+const getUserId = (req: Request) => {
+    const token = req.cookies?.token;
+    const decoded = jwt.verify(token, JWT_SECRET) as { userId: string };
+    return decoded.userId;
+}
 
 const stylePrompts = {
     'Bold & Graphic': 'eye-catching thumbnail, bold typography, vibrant colors, expressive facial reaction, dramatic lighting, high contrast, click-worthy composition, professional style',
@@ -25,7 +34,7 @@ const colorSchemeDescriptions = {
 
 export const generateThumbnail = async (req: Request, res: Response) => {
     try {
-        const { userId } = req.session;
+        const userId = getUserId(req);
         const { title, prompt: user_prompt, style, aspect_ratio, color_scheme, text_overlay } = req.body;
 
         const thumbnail = await Thumbnail.create({
@@ -71,20 +80,17 @@ export const generateThumbnail = async (req: Request, res: Response) => {
 
         prompt += `The thumbnail should be ${aspect_ratio}, visually stunning, and designed to maximize click-through rate. Make it bold, professional, and impossible to ignore.`;
 
-        // Generate the image using the ai model
         const response: any = await ai.models.generateContent({
             model,
             contents: [prompt],
             config: generationConfig,
         });
 
-        // Check if the response is valid
         if (!response?.candidates?.[0]?.content?.parts) {
             throw new Error('Unexpected response');
         }
 
         const parts = response.candidates[0].content.parts;
-
         let finalBuffer: Buffer | null = null;
 
         for (const part of parts) {
@@ -114,11 +120,10 @@ export const generateThumbnail = async (req: Request, res: Response) => {
     }
 };
 
-// Controllers For Thumbnail Deletion
 export const deleteThumbnail = async (req: Request, res: Response) => {
     try {
+        const userId = getUserId(req);
         const { id } = req.params;
-        const { userId } = req.session;
 
         await Thumbnail.findByIdAndDelete({ _id: id, userId });
 
